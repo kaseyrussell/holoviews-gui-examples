@@ -1,64 +1,70 @@
 # Run with 
 # bokeh serve --show <name>
-import numpy as np
 import pandas as pd
 import panel as pn
 import holoviews as hv
 from holoviews.streams import Buffer
-from bokeh.io import curdoc
-from bokeh.models import Button, Slider
-from datetime import datetime
+from bokeh.models import Button, Slider, Spinner
+import time
 import asyncio
-import streamz.dataframe
-import hvplot.streamz
+from fake_instrument import FakeInstrument  # replace this with whatever you're trying to communicate with
 
-hv.extension('bokeh')
-hv.renderer('bokeh').theme = 'caliber'
-doc = curdoc()
-global stop
+#
+# Initialize your instrument
+#
+instrument = FakeInstrument()
 
-button = Button(label="Start")
-slider = Slider(title='Value', start=-1.0, end=1.0, value=0.0, step=0.01)
+#
+# Make a buffer to hold the instrument data. You could get by without making a Pandas Dataframe, but it does a good
+# job of handling things like writing to a csv file
+#
+def make_df(time_sec=0.0, x=0.0):
+    return pd.DataFrame({'Time (s)': time_sec, 'x': x}, index=[0])
 
-def make_df(time, x):
-    x = [x] if type(x) is float else x
-    return pd.DataFrame({'Time': time, 'x': x}).set_index('Time')
-
-example_df = make_df(0.0, np.zeros(0))
-buffer = Buffer(example_df.loc[:, ['x']], length=1000)
+#
+# Initialize the plot. Holoviews handles all of the plotting and makes some guesses about what columns to plot.
+#
+example_df = make_df()
+buffer = Buffer(example_df, length=1000, index=False)
 plot = hv.DynamicMap(hv.Curve, streams=[buffer]).opts(padding=0.1, width=600, xlim=(0, None))
 
 #
-# fake instrument
-# 
-def read_from_sensor():
-    return np.random.random()
+# Define any other GUI components
+#
+button = Button(label="Start")
+offset = Slider(title='Offset', start=-10.0, end=10.0, value=0.0, step=0.1)
+interval = Spinner(title="Interval (sec)", value=0.1, step=0.01)
 
-async def acquire_data(start_time):
-    global stop
+acquisition_task = None
+
+async def acquire_data(interval_sec=0.1):
+    t0 = time.time()
     while True:
-        if stop:
-            return
-        duration = (datetime.now() - start_time).total_seconds()
-        value = read_from_sensor()
-        value += 10 * slider.value
-        b = make_df(duration, value)
-        buffer.send(b.loc[:, ['x']])
-        await asyncio.sleep(0.1)
+        instrument.set_offset(offset.value)
+        time_elapsed = time.time() - t0
+        value = instrument.read_data()
+        b = make_df(time_elapsed, value)
+        buffer.send(b)
+        time_spent_buffering = time.time() - t0 - time_elapsed
+        if interval_sec > time_spent_buffering:
+            await asyncio.sleep(interval_sec - time_spent_buffering)
 
 def start_stop():
-    global stop
+    global acquisition_task
     if button.label == 'Start':
         button.label = 'Stop'
         buffer.clear()
-        stop = False
-        t0 = datetime.now()
-        asyncio.get_running_loop().create_task(acquire_data(t0))
+        acquisition_task = asyncio.get_running_loop().create_task(acquire_data(interval_sec=interval.value))
     else:
-        stop = True
         button.label = 'Start'
+        acquisition_task.cancel()
 
 button.on_click(start_stop)
-pn.Row(pn.panel(plot),
-        pn.panel(pn.WidgetBox('# Controls', button, slider))).servable()
+hv.extension('bokeh')
+hv.renderer('bokeh').theme = 'caliber'
+controls = pn.WidgetBox('# Controls',
+                        interval,
+                        button,
+                        offset)
+pn.Row(plot, controls).servable()
 
