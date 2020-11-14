@@ -1,0 +1,12 @@
+name: holoviews-gui-examples
+channels:
+    - pyviz
+dependencies:
+    - python=3.7
+    - holoviews
+    - panel
+    - pandas
+    - ipython
+    - streamz
+    - hvplot
+
