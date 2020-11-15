@@ -7,7 +7,7 @@ standard GUI toolkits like Tk, Qt, or wxPython.
 
 The data science field has recently been building some amazing tools for interacting with data.
 Compared to the standard GUI toolkits, these data science GUI toolkits are much more along the lines of what 
-I typically need as a scientist and engineer.
+I typically need as a scientist and engineer doing hardware automation.
 
 This repo has a few example GUIs built using [Holoviews](http://holoviews.org) and 
 [Bokeh](https://bokeh.org). These aren't drastically different than the examples in the guide to 
@@ -21,6 +21,9 @@ module and replace it with a module for communicating with a real piece of hardw
 ## Examples
 1. [timeseries_plot_single_variable.py](timeseries_plot_single_variable.py)
 ![timeseries_plot_single_variable.py](screenshots/timeseries_plot_single_variable.gif)
+
+2. [timeseries_plot_multiple_variables.py](timeseries_plot_multiple_variables.py)
+![timeseries_plot_multiple_variables.py](screenshots/timeseries_plot_multiple_variables.gif)
 
 ## Setup
 I'm assuming you're using Anaconda Python.
