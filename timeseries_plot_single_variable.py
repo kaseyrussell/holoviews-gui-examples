@@ -16,10 +16,10 @@ instrument = FakeInstrument()
 
 #
 # Make a buffer to hold the instrument data. You could get by without making a Pandas Dataframe, but it does a good
-# job of handling things like writing to a csv file
+# job of handling things like writing to a csv file.
 #
-def make_df(time_sec=0.0, x=0.0):
-    return pd.DataFrame({'Time (s)': time_sec, 'x': x}, index=[0])
+def make_df(time_sec=0.0, temperature_degC=0.0):
+    return pd.DataFrame({'Time (s)': time_sec, 'Temperature (°C)': temperature_degC}, index=[0])
 
 #
 # Initialize the plot. Holoviews handles all of the plotting and makes some guesses about what columns to plot.
