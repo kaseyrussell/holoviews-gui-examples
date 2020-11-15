@@ -28,9 +28,11 @@ I'm assuming you're using Anaconda Python.
 1. Clone this repo onto your computer
 2. Open an Anaconda prompt and navigate to the folder that contains this README.md file.
 3. To create a new environment with all the necessary packages, type this command at the Anaconda prompt:
-`> conda env create -f environment.yml`
+```> conda env create -f environment.yml```
+
 4. Activate the environment you just created by typing this command at the prompt:
-`> conda activate holoviews-gui-examples'
+```> conda activate holoviews-gui-examples```
+
 5. Try out one of the examples. Running this command should open a new browser tab with the GUI in it:
-`> bokeh serve --show timeseries_plot_single_variable.py`
+```> bokeh serve --show timeseries_plot_single_variable.py```
 
