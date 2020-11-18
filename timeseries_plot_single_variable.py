@@ -10,19 +10,20 @@ import asyncio
 from fake_instrument import FakeInstrument  # replace this with whatever you're trying to communicate with
 
 #
-# Initialize your temperature1
+# Initialize your temperature monitor
 #
 instrument = FakeInstrument()
 
 #
-# Make a buffer to hold the temperature1 data. You could get by without making a Pandas Dataframe, but it does a good
+# Make a dataframe to hold the buffered data. You could get by without making a Pandas Dataframe, but it does a good
 # job of writing to a csv file.
 #
 def make_df(time_sec=0.0, temperature_degC=0.0):
     return pd.DataFrame({'Time (s)': time_sec, 'Temperature (°C)': temperature_degC}, index=[0])
 
 #
-# Initialize the plot. Holoviews handles all of the plotting and makes some guesses about what columns to plot.
+# Initialize the buffer and the plot.
+# Holoviews handles all of the plotting and makes some guesses about what columns to plot.
 #
 example_df = pd.DataFrame(columns=make_df().columns)
 buffer = Buffer(example_df, length=1000, index=False)
@@ -33,11 +34,11 @@ plot = hv.DynamicMap(hv.Curve, streams=[buffer]).opts(padding=0.1, width=600, xl
 #
 LABEL_START = 'Start'
 LABEL_STOP = 'Stop'
-button_startstop = Button(label=LABEL_START)
 LABEL_CSV_START = "Save to csv"
 LABEL_CSV_STOP = "Stop save"
 CSV_FILENAME = 'tmp.csv'
 
+button_startstop = Button(label=LABEL_START)
 button_csv = Button(label=LABEL_CSV_START)
 offset = Slider(title='Offset', start=-10.0, end=10.0, value=0.0, step=0.1)
 interval = Spinner(title="Interval (sec)", value=0.1, step=0.01)
