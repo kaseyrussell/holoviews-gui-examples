@@ -52,10 +52,10 @@ save_to_csv = False
 
 
 #
-# Here we're using a coroutine to handle getting the data from the temperature1 and plotting it without blocking
-# the GUI. In my experience, this works fine if you are only trying to get data from your temperature1 once every
+# Here we're using a coroutine to handle getting the data from the instrument and plotting it without blocking
+# the GUI. In my experience, this works fine if you are only trying to get data from your instrument once every
 # ~50 ms or so. The buffering and plotting take on the order of 10-20 ms. If you need to communicate with your
-# temperature1 on millisecond timescales, then you'll want a separate thread and maybe even separate hardware. And you
+# instrument on millisecond timescales, then you'll want a separate thread and maybe even separate hardware. And you
 # won't want to update the plot with every single data point.
 #
 async def acquire_data(interval_sec=0.1):
